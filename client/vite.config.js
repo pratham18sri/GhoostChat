@@ -7,16 +7,16 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/socket.io': {
-        target: 'http://localhost:3001',
+        target: 'https://ghoostchat-2.onrender.com',
         ws: true,
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'https://ghoostchat-2.onrender.com',
         changeOrigin: true,
       },
       '/health': {
-        target: 'http://localhost:3001',
+        target: 'https://ghoostchat-2.onrender.com',
         changeOrigin: true,
       },
     },

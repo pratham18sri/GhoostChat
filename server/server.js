@@ -26,7 +26,7 @@ const cleanupWorker = require('./cleanupWorker');
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const PORT             = process.env.PORT || 3001;
-const CLIENT_ORIGIN    = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const CLIENT_ORIGIN    = process.env.CLIENT_ORIGIN || 'https://ghoostchat-1.onrender.com';
 const NODE_ENV         = process.env.NODE_ENV || 'development';
 const IS_PROD          = NODE_ENV === 'production';
 const MAX_MSG_LENGTH   = 500;
@@ -54,7 +54,7 @@ app.use(
 
 // CORS — only allow configured origin
 const corsOptions = {
-  origin:      IS_PROD ? CLIENT_ORIGIN : [CLIENT_ORIGIN, 'http://localhost:5173', 'http://localhost:4173'],
+  origin:      CLIENT_ORIGIN,
   credentials: true,
   methods:     ['GET', 'POST'],
 };
