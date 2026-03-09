@@ -33,7 +33,7 @@ export default function App() {
   }, [on]);
 
   // ── Handle join attempt from JoinRoom form ──────────────────────────────────
-  const handleJoin = useCallback(({ name, roomCode, e2e }) => {
+  const handleJoin = useCallback(({ name, roomCode, e2e, createOnly = false }) => {
     setJoinErr('');
     setSession({ name, roomCode, e2e });
 
@@ -41,7 +41,7 @@ export default function App() {
     connect();
 
     // Emit join_room — server responds with room_joined or join_error
-    joinRoom(roomCode, name);
+    joinRoom(roomCode, name, createOnly);
 
     // Optimistically enter chat; join_error will bounce us back
     setView('chat');

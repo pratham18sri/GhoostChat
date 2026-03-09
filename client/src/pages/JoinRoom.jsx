@@ -43,17 +43,27 @@ function Badge({ icon, label }) {
 }
 
 // ─── Main page component ──────────────────────────────────────────────────────
-export default function JoinRoom({ onJoin }) {
-  const [name,     setName]     = useState('');
-  const [roomCode, setRoomCode] = useState('');
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
-  const [e2e,      setE2e]      = useState(true);
-  const [copied,   setCopied]   = useState(false);
+export default function JoinRoom({ onJoin, externalError }) {
+  const [name,        setName]        = useState('');
+  const [roomCode,    setRoomCode]    = useState('');
+  const [error,       setError]       = useState('');
+  const [loading,     setLoading]     = useState(false);
+  const [e2e,         setE2e]         = useState(true);
+  const [copied,      setCopied]      = useState(false);
+  const [isGenerated, setIsGenerated] = useState(false);
+
+  // Show server-side join errors (e.g. code already in use) and reset loading
+  useEffect(() => {
+    if (externalError) {
+      setError(externalError);
+      setLoading(false);
+    }
+  }, [externalError]);
 
   const handleGenerate = useCallback(() => {
     setRoomCode(generateCode());
     setError('');
+    setIsGenerated(true);
   }, []);
 
   const handleSubmit = useCallback(
@@ -82,14 +92,15 @@ export default function JoinRoom({ onJoin }) {
       }
 
       setLoading(true);
-      onJoin({ name: trimName, roomCode: trimCode, e2e });
+      onJoin({ name: trimName, roomCode: trimCode, e2e, createOnly: isGenerated });
     },
-    [name, roomCode, e2e, onJoin],
+    [name, roomCode, e2e, isGenerated, onJoin],
   );
 
   const handleRoomCodeInput = (v) => {
     setRoomCode(v.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 12));
     setError('');
+    setIsGenerated(false);
   };
 
   const handleCopyCode = async () => {

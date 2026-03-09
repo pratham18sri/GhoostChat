@@ -130,7 +130,7 @@ io.on('connection', (socket) => {
   let currentName  = null;
 
   // ── join_room ─────────────────────────────────────────────────────────────
-  socket.on('join_room', ({ roomCode, name } = {}) => {
+  socket.on('join_room', ({ roomCode, name, createOnly = false } = {}) => {
     try {
       // Input validation
       if (!roomCode || typeof roomCode !== 'string') {
@@ -152,6 +152,13 @@ io.on('connection', (socket) => {
       if (!rateLimiter.checkJoinRate(socket.id)) {
         return socket.emit('join_error', {
           message: 'Too many join attempts. Wait a moment.',
+        });
+      }
+
+      // If user intends to create a brand-new room, reject if code is already taken
+      if (createOnly === true && roomManager.roomExists(normalizedCode)) {
+        return socket.emit('join_error', {
+          message: 'Room code already in use. Please generate a new one.',
         });
       }
 

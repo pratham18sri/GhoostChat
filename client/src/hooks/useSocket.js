@@ -53,8 +53,8 @@ export function useSocket() {
     socket.disconnect();
   }, []);
 
-  const joinRoom = useCallback((roomCode, name) => {
-    socket.emit('join_room', { roomCode, name });
+  const joinRoom = useCallback((roomCode, name, createOnly = false) => {
+    socket.emit('join_room', { roomCode, name, createOnly });
   }, []);
 
   const leaveRoom = useCallback(() => {
