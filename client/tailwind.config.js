@@ -5,23 +5,23 @@ export default {
     extend: {
       colors: {
         ghost: {
-          bg:       '#000000',
-          surface:  '#050d05',
-          card:     '#0a150a',
-          border:   '#0d2a0d',
-          muted:    '#1a3a1a',
-          text:     '#00ff41',
-          subtle:   '#3d8c40',
-          accent:   '#00ff41',
-          accent2:  '#00cc33',
-          glow:     '#00ff41',
-          danger:   '#ff0000',
-          success:  '#00ff41',
-          warn:     '#ffff00',
+          bg:       '#07070f',
+          surface:  '#0f0f1a',
+          card:     '#14142a',
+          border:   '#1e1e3a',
+          muted:    '#2a2a4a',
+          text:     '#e2e0ff',
+          subtle:   '#9890cc',
+          accent:   '#7c3aed',
+          accent2:  '#6d28d9',
+          glow:     '#a78bfa',
+          danger:   '#ef4444',
+          success:  '#10b981',
+          warn:     '#f59e0b',
         },
       },
       fontFamily: {
-        sans: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       animation: {
@@ -33,9 +33,6 @@ export default {
         'slide-in-l':  'slideInL 0.25s ease-out',
         'shimmer':     'shimmer 1.5s infinite',
         'bounce-soft': 'bounceSoft 1s ease-in-out infinite',
-        'glitch':      'glitch 3s infinite',
-        'scanline':    'scanline 8s linear infinite',
-        'blink':       'blink 1s step-end infinite',
       },
       keyframes: {
         float: {
@@ -43,8 +40,8 @@ export default {
           '50%':      { transform: 'translateY(-10px)' },
         },
         pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(0, 255, 65, 0.3)' },
-          '50%':      { boxShadow: '0 0 40px rgba(0, 255, 65, 0.7)' },
+          '0%, 100%': { boxShadow: '0 0 20px rgba(124, 58, 237, 0.3)' },
+          '50%':      { boxShadow: '0 0 40px rgba(124, 58, 237, 0.7)' },
         },
         fadeIn: {
           from: { opacity: '0' },
@@ -69,21 +66,6 @@ export default {
         bounceSoft: {
           '0%, 100%': { transform: 'scaleY(1)' },
           '50%':      { transform: 'scaleY(0.6)' },
-        },
-        glitch: {
-          '0%, 90%, 100%': { transform: 'translate(0)' },
-          '92%': { transform: 'translate(-2px, 1px)', filter: 'hue-rotate(90deg)' },
-          '94%': { transform: 'translate(2px, -1px)' },
-          '96%': { transform: 'translate(-1px, 2px)', filter: 'hue-rotate(-90deg)' },
-          '98%': { transform: 'translate(1px, -2px)' },
-        },
-        scanline: {
-          '0%':   { transform: 'translateY(-100%)' },
-          '100%': { transform: 'translateY(100vh)' },
-        },
-        blink: {
-          '0%, 100%': { opacity: '1' },
-          '50%':      { opacity: '0' },
         },
       },
       backdropBlur: {
