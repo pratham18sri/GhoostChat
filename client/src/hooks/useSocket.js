@@ -1,6 +1,6 @@
 /**
  * useSocket — manages Socket.IO connection lifecycle and
- * exposes typed helpers for all GHOOSTCHAT events.
+ * exposes typed helpers for all GHOSTCHAT events.
  */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
@@ -73,6 +73,10 @@ export function useSocket() {
     socket.emit('typing_stop');
   }, []);
 
+  const clearChat = useCallback(() => {
+    socket.emit('clear_chat');
+  }, []);
+
   return {
     socket,
     connected,
@@ -84,6 +88,7 @@ export function useSocket() {
     sendMessage,
     sendTypingStart,
     sendTypingStop,
+    clearChat,
     on,
     off,
   };

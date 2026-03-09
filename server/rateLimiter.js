@@ -1,5 +1,5 @@
 /**
- * Socket-level rate limiter for GHOOSTCHAT.
+ * Socket-level rate limiter for GHOSTCHAT.
  *
  * Tracks per-socket message rates and per-IP connection counts
  * entirely in process memory — no external store required.

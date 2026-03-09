@@ -1,5 +1,5 @@
 /**
- * GHOOSTCHAT — Production-grade ephemeral chat server.
+ * GHOSTCHAT — Production-grade ephemeral chat server.
  *
  * Privacy guarantees:
  *   - Zero message persistence. Messages are broadcast and immediately forgotten.
@@ -184,6 +184,7 @@ io.on('connection', (socket) => {
         roomCode:  code,
         name:      currentName,
         isNew:     wasNew,
+        isHost:    roomManager.isHost(code, socket.id),
         userCount: users.length,
         users:     users.map(u => ({ name: u.name, isYou: u.socketId === socket.id })),
       });
@@ -280,6 +281,13 @@ io.on('connection', (socket) => {
     }
   });
 
+  // ── clear_chat (host only) ─────────────────────────────────────────────────
+  socket.on('clear_chat', () => {
+    if (!currentRoom) return;
+    if (!roomManager.isHost(currentRoom, socket.id)) return;
+    io.to(currentRoom).emit('chat_cleared', { clearedBy: currentName });
+  });
+
   // ── leave_room ────────────────────────────────────────────────────────────
   socket.on('leave_room', () => {
     leaveCurrentRoom(socket);
@@ -302,14 +310,24 @@ io.on('connection', (socket) => {
     const { destroyed, user } = roomManager.removeUserFromRoom(leavingRoom, sock.id);
     const name = user?.name || currentName || 'Someone';
 
+    // Remove from Socket.IO room (no-op if already removed by disconnect)
     sock.leave(leavingRoom);
 
     if (hostLeaving && !destroyed) {
-      // Host left — kick everyone and destroy the room
-      io.to(leavingRoom).emit('room_closed', {
-        reason: `Host ${name} disconnected. Channel terminated.`,
-      });
+      // Capture remaining users before deleting the room record
+      const remainingUsers = roomManager.getRoomUsers(leavingRoom);
       roomManager.deleteRoom(leavingRoom);
+
+      // Send room_closed directly to each remaining connected socket
+      // (bypasses Socket.IO adapter room lookup which may lag after disconnect)
+      remainingUsers.forEach(({ socketId }) => {
+        const target = io.sockets.sockets.get(socketId);
+        if (target) {
+          target.emit('room_closed', {
+            reason: `Host ${name} left. Room has been closed.`,
+          });
+        }
+      });
     } else if (!destroyed) {
       const users = roomManager.getRoomUsers(leavingRoom);
       io.to(leavingRoom).emit('user_left', {
@@ -318,7 +336,6 @@ io.on('connection', (socket) => {
         users:     users.map(u => ({ name: u.name })),
       });
     }
-    // If destroyed, cleanup worker or auto-destroy already handled broadcast
 
     currentRoom = null;
     currentName = null;
@@ -327,7 +344,7 @@ io.on('connection', (socket) => {
 
 // ─── Start server ─────────────────────────────────────────────────────────────
 httpServer.listen(PORT, () => {
-  console.log(`\n🔒 GHOOSTCHAT server running on port ${PORT}`);
+  console.log(`\n🔒 GHOSTCHAT server running on port ${PORT}`);
   console.log(`   Environment : ${NODE_ENV}`);
   console.log(`   Client origin: ${CLIENT_ORIGIN}`);
   console.log(`   Privacy mode : messages are never persisted or logged\n`);

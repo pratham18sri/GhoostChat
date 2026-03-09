@@ -9,7 +9,7 @@ import { io } from 'socket.io-client';
 
 const SERVER_URL =
   import.meta.env.VITE_SERVER_URL ||
-  (import.meta.env.DEV ? 'https://ghoostchat-2.onrender.com' : window.location.origin);
+  (import.meta.env.DEV ? 'https://ghostchat-2.onrender.com' : window.location.origin);
 
 const socket = io(SERVER_URL, {
   autoConnect:  false,

@@ -1,1 +1,1 @@
-# GhoostChat
+# GhostChat

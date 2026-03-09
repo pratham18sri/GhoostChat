@@ -52,13 +52,14 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
   const [resetInMs,     setResetInMs]     = useState(0);
   const [copied,        setCopied]        = useState(false);
   const [showUsers,     setShowUsers]     = useState(false);
+  const [isHost,        setIsHost]        = useState(false);
   const [e2eStatus,     setE2eStatus]     = useState(e2eEnabled ? 'initialising' : 'off');
   const [connectionBanner, setConnectionBanner] = useState(null);
 
   const rateLimitTimer = useRef(null);
   const typingTimers   = useRef({});
 
-  const { connected, reconnecting, on, connect, leaveRoom, sendMessage, sendTypingStart, sendTypingStop } = useSocket();
+  const { connected, reconnecting, on, connect, leaveRoom, sendMessage, sendTypingStart, sendTypingStop, clearChat } = useSocket();
   const { initKey, encrypt, decrypt, e2eEnabled: keyReady } = useEncryption();
 
   // ── Init: connect + key derivation ─────────────────────────────────────────
@@ -87,8 +88,9 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
   // ── Socket events ───────────────────────────────────────────────────────────
   useEffect(() => {
     const offs = [
-      on('room_joined', ({ isNew, userCount, users: u }) => {
+      on('room_joined', ({ isNew, isHost: h, userCount, users: u }) => {
         setUsers(u);
+        setIsHost(h);
         setMessages([sysMsg(
           isNew
             ? `Room created. ${userCount} ${userCount === 1 ? 'person' : 'people'} here.`
@@ -175,6 +177,10 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
       on('error_event', ({ message: msg }) => {
         setMessages(m => [...m, sysMsg(`⚠ ${msg}`)]);
       }),
+
+      on('chat_cleared', ({ clearedBy }) => {
+        setMessages([sysMsg(`Chat cleared by host ${clearedBy}.`)]);
+      }),
     ];
 
     return () => offs.forEach(off => off());
@@ -205,7 +211,8 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
   // ── Leave ───────────────────────────────────────────────────────────────────
   const handleLeave = useCallback(() => {
     leaveRoom();
-    onLeave();
+    // Delay to let the leave_room packet transmit before closing the socket
+    setTimeout(onLeave, 300);
   }, [leaveRoom, onLeave]);
 
   // ── E2E status pill ─────────────────────────────────────────────────────────
@@ -234,7 +241,7 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
             <div className="text-xl leading-none select-none">👻</div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm gradient-text">GHOOSTCHAT</span>
+                <span className="font-bold text-sm gradient-text">GHOSTCHAT</span>
                 <E2EPill />
               </div>
               <div className="flex items-center gap-1.5 mt-0.5">
@@ -272,6 +279,23 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
                 currentName={name}
                 onClose={() => setShowUsers(false)}
               />
+            )}
+
+            {/* Clear Chat — host only */}
+            {isHost && (
+              <button
+                onClick={clearChat}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ghost-border
+                           bg-ghost-surface text-ghost-subtle hover:border-amber-600 hover:text-amber-400
+                           transition-all duration-200 text-xs font-medium"
+                title="Clear chat for everyone"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Clear
+              </button>
             )}
 
             {/* Leave */}

@@ -1,5 +1,5 @@
 /**
- * End-to-end encryption for GHOOSTCHAT.
+ * End-to-end encryption for GHOSTCHAT.
  *
  * Algorithm: AES-GCM 256-bit
  * Key derivation: PBKDF2-SHA256 from the room code.

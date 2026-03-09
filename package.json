@@ -1,5 +1,5 @@
 {
-  "name": "ghoostchat",
+  "name": "ghostchat",
   "version": "1.0.0",
   "description": "Ephemeral private chat rooms. No accounts. No logs. No trace.",
   "main": "server/server.js",

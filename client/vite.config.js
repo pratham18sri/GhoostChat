@@ -7,16 +7,16 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/socket.io': {
-        target: 'https://ghoostchat-2.onrender.com',
+        target: 'https://ghostchat-2.onrender.com',
         ws: true,
         changeOrigin: true,
       },
       '/api': {
-        target: 'https://ghoostchat-2.onrender.com',
+        target: 'https://ghostchat-2.onrender.com',
         changeOrigin: true,
       },
       '/health': {
-        target: 'https://ghoostchat-2.onrender.com',
+        target: 'https://ghostchat-2.onrender.com',
         changeOrigin: true,
       },
     },

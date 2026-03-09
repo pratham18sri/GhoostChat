@@ -132,7 +132,7 @@ export default function JoinRoom({ onJoin, externalError }) {
             </div>
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight mb-1">
-            <span className="gradient-text">GHOOST</span>
+            <span className="gradient-text">GHOST</span>
             <span className="text-ghost-subtle font-light">CHAT</span>
           </h1>
           <p className="text-ghost-subtle text-sm mt-2">
