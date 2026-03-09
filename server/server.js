@@ -289,14 +289,23 @@ io.on('connection', (socket) => {
   function leaveCurrentRoom(sock) {
     if (!currentRoom) return;
 
-    const { destroyed, user } = roomManager.removeUserFromRoom(currentRoom, sock.id);
+    const leavingRoom = currentRoom;
+    const hostLeaving = roomManager.isHost(leavingRoom, sock.id);
+
+    const { destroyed, user } = roomManager.removeUserFromRoom(leavingRoom, sock.id);
     const name = user?.name || currentName || 'Someone';
 
-    sock.leave(currentRoom);
+    sock.leave(leavingRoom);
 
-    if (!destroyed) {
-      const users = roomManager.getRoomUsers(currentRoom);
-      io.to(currentRoom).emit('user_left', {
+    if (hostLeaving && !destroyed) {
+      // Host left — kick everyone and destroy the room
+      io.to(leavingRoom).emit('room_closed', {
+        reason: `Host ${name} disconnected. Channel terminated.`,
+      });
+      roomManager.deleteRoom(leavingRoom);
+    } else if (!destroyed) {
+      const users = roomManager.getRoomUsers(leavingRoom);
+      io.to(leavingRoom).emit('user_left', {
         name,
         userCount: users.length,
         users:     users.map(u => ({ name: u.name })),

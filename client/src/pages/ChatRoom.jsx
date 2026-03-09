@@ -153,6 +153,11 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
         setMessages(m => [...m, sysMsg(`⚠ Rate limited: ${msg}`)]);
       }),
 
+      on('room_closed', ({ reason }) => {
+        setMessages(m => [...m, sysMsg(`[TERMINATED] ${reason}`)]);
+        setTimeout(onLeave, 3_000);
+      }),
+
       on('room_destroyed', ({ reason }) => {
         setMessages(m => [...m, sysMsg(`Room destroyed: ${reason}`)]);
         setTimeout(onLeave, 3_000);
@@ -222,14 +227,15 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
   return (
     <div className="flex flex-col h-screen bg-ghost-bg">
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="shrink-0 border-b border-ghost-border bg-ghost-surface/80 backdrop-blur-sm px-4 py-3">
+      <header className="shrink-0 border-b border-ghost-border bg-ghost-surface px-4 py-3"
+              style={{boxShadow:'0 0 20px rgba(0,255,65,0.05)'}}>
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           {/* Brand + room code */}
           <div className="flex items-center gap-3 min-w-0">
-            <div className="text-xl leading-none select-none">👻</div>
+            <div className="text-sm leading-none select-none font-mono text-ghost-accent">&gt;_</div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm gradient-text">GHOOSTCHAT</span>
+                <span className="font-bold text-sm gradient-text tracking-widest font-mono">GHOOSTCHAT</span>
                 <E2EPill />
               </div>
               <div className="flex items-center gap-1.5 mt-0.5">
@@ -241,7 +247,7 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
                   {roomCode}
                 </button>
                 {copied && (
-                  <span className="text-[10px] text-ghost-success animate-fade-in">Copied!</span>
+                  <span className="text-[10px] text-ghost-success animate-fade-in font-mono">// copied</span>
                 )}
               </div>
             </div>
@@ -252,12 +258,12 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
             {/* User count */}
             <button
               onClick={() => setShowUsers(v => !v)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ghost-border
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-ghost-border
                          bg-ghost-surface text-ghost-subtle hover:border-ghost-accent hover:text-ghost-text
-                         transition-all duration-200 text-xs font-medium"
+                         transition-all duration-200 text-xs font-mono uppercase tracking-widest"
             >
               <span className="online-dot" />
-              <span>{users.length}</span>
+              <span>{users.length} online</span>
             </button>
 
             {/* User list dropdown */}
@@ -272,16 +278,16 @@ export default function ChatRoom({ roomCode, name, e2eEnabled, onLeave }) {
             {/* Leave */}
             <button
               onClick={handleLeave}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ghost-border
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-ghost-border
                          bg-ghost-surface text-ghost-subtle hover:border-red-700 hover:text-red-400
-                         transition-all duration-200 text-xs font-medium"
-              title="Leave room"
+                         transition-all duration-200 text-xs font-mono uppercase tracking-widest"
+              title="Disconnect"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              Leave
+              [EXIT]
             </button>
           </div>
         </div>

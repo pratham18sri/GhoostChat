@@ -23,6 +23,7 @@ const VALID_ROOM_CODE_RE = /^[A-Z0-9]{4,12}$/;
  *
  * RoomRecord = {
  *   users: Map<socketId, { name: string, joinedAt: number }>,
+ *   hostSocketId: string|null,
  *   createdAt: number,
  *   lastActivity: number
  * }
@@ -60,6 +61,7 @@ function createRoom(roomCode) {
 
   rooms.set(code, {
     users: new Map(),
+    hostSocketId: null,
     createdAt: Date.now(),
     lastActivity: Date.now(),
   });
@@ -87,6 +89,11 @@ function addUserToRoom(roomCode, socketId, name) {
     name: sanitizeName(name),
     joinedAt: Date.now(),
   });
+
+  // First user to join becomes the host
+  if (room.hostSocketId === null) {
+    room.hostSocketId = socketId;
+  }
 
   room.lastActivity = Date.now();
   return true;
@@ -145,6 +152,12 @@ function getRoomInfo(roomCode) {
   };
 }
 
+function isHost(roomCode, socketId) {
+  const room = rooms.get(normalizeCode(roomCode));
+  if (!room) return false;
+  return room.hostSocketId === socketId;
+}
+
 // ─── Cleanup helpers ──────────────────────────────────────────────────────────
 function getInactiveRooms(thresholdMs = ROOM_INACTIVITY_TIMEOUT_MS) {
   const now = Date.now();
@@ -172,6 +185,7 @@ module.exports = {
   removeUserFromRoom,
   getRoomUsers,
   getUserInRoom,
+  isHost,
   updateRoomActivity,
   getRoomInfo,
   getInactiveRooms,
